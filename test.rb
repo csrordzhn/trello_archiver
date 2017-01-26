@@ -10,6 +10,60 @@ end
 
 me = Trello::Member.find("cesarordonezhn")
 
-puts "You have #{me.boards.count} boards on Trello" # returns array. Method count returns how many boards
+# puts "You have #{me.boards.count} boards on Trello" # returns array. Method count returns how many boards
 
 # get the boards from work.
+
+# puts "You have #{me.organizations.count} teams on Trello" # returns array. Method count returns how many boards
+
+#me.organizations.each do |o|
+#    o.boards.each do |b|
+#      puts "#{b.name} belongs to #{o.name}"
+#    end
+#  end
+
+# archive completed cards in a boards
+
+team = Trello::Organization.find("dev_test")
+
+
+board = team.boards.first # get the boards from this team
+lists = board.lists # get the lists from the board
+
+cards = lists.map do |l|
+  l.cards.each do |c| c.id end
+end
+
+cards_2 = cards.flatten
+
+card_ids = cards_2.map { |c| c.id }
+
+card_ids.each do |c|
+  card = Trello::Card.find(c)
+  #puts card.name
+  card.close! if card.name == "A completed card"
+end
+#cards = lists.map {|l| l.card} # get the cards from the lists
+
+#puts team.name
+
+# works
+# my_board = Trello::Board.find("Dev_Board")
+
+#lists_in_my_board = my_board.lists
+
+#puts lists_in_my_board.class
+
+# works, longer
+#board = team.boards.keep_if do |b|
+#  b.name == "Dev_Board"
+#end
+
+#puts board.count
+#puts board.first.has_lists?
+
+#lists_in_my_board.each do |list|
+#  list.cards.each do |card|
+#    card.close! if card.powerup.checked
+#  end
+#end
