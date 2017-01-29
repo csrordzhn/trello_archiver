@@ -1,1 +1,4 @@
 config/config_env.rb
+*.first
+ts = board.lists
+Gemfile.lock

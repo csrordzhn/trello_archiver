@@ -41,7 +41,8 @@ card_ids = cards_2.map { |c| c.id }
 card_ids.each do |c|
   card = Trello::Card.find(c)
   #puts card.name
-  card.close! if card.name == "A completed card"
+  is_complete = card.labels.keep_if { |lb| lb.name == "Complete" }
+  card.close! if is_complete.count >= 1
 end
 #cards = lists.map {|l| l.card} # get the cards from the lists
 
