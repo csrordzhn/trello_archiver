@@ -10,61 +10,49 @@ end
 
 me = Trello::Member.find("cesarordonezhn")
 
-# puts "You have #{me.boards.count} boards on Trello" # returns array. Method count returns how many boards
-
-# get the boards from work.
-
-# puts "You have #{me.organizations.count} teams on Trello" # returns array. Method count returns how many boards
-
-#me.organizations.each do |o|
-#    o.boards.each do |b|
-#      puts "#{b.name} belongs to #{o.name}"
-#    end
-#  end
-
-# archive completed cards in a boards
-
 team = Trello::Organization.find("dev_test")
-
 
 board = team.boards.first # get the boards from this team
 lists = board.lists # get the lists from the board
+
 
 cards = lists.map do |l|
   l.cards.each do |c| c.id end
 end
 
 cards_2 = cards.flatten
-
 card_ids = cards_2.map { |c| c.id }
+
+# 1) classify
 
 card_ids.each do |c|
   card = Trello::Card.find(c)
-  #puts card.name
+  proy_label = card.name.last(5).upcase
+  exists = card.labels.keep_if {|lb| lb.name == proy_label }
+  lbl_color="sky" # depends on the list
+  Trello::Label.create({name:proy_label, board_id:card.board_id, color: lbl_color}) if exists.count == 0
+  new_label = Trello::Label.new
+  new_label.name = proy_label
+  new_label.color = lbl_color
+  card.add_label(new_label)
+end
+
+
+# 2) send email to list owner
+
+# for each list get an array of cards with their status
+# prepare message text
+# send message string to list owner
+
+# 3) close cards
+card_ids.each do |c|
+  card = Trello::Card.find(c)
   is_complete = card.labels.keep_if { |lb| lb.name == "Complete" }
   card.close! if is_complete.count >= 1
 end
-#cards = lists.map {|l| l.card} # get the cards from the lists
 
-#puts team.name
 
-# works
-# my_board = Trello::Board.find("Dev_Board")
 
-#lists_in_my_board = my_board.lists
 
-#puts lists_in_my_board.class
-
-# works, longer
-#board = team.boards.keep_if do |b|
-#  b.name == "Dev_Board"
-#end
-
-#puts board.count
-#puts board.first.has_lists?
-
-#lists_in_my_board.each do |list|
-#  list.cards.each do |card|
-#    card.close! if card.powerup.checked
-#  end
-#end
+# 2) send email to owner list
+# send summary email
